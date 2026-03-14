@@ -24,6 +24,7 @@ export default function Home() {
   
   const heroY = useTransform(scrollY, [0, 500], [0, -100]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.3]);
+  const router = useRouter();
 
   const handleScroll = () => {
     setShowScrollTop(window.scrollY > 400);
@@ -136,7 +137,7 @@ export default function Home() {
               whileTap={{ y: 0, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              <Button size={"lg"} className="bg-amber-300 hover:bg-amber-400 text-black font-semibold px-8 py-6 text-lg transition-colors duration-200">
+              <Button size={"lg"} className="bg-amber-300 hover:bg-amber-400 text-black font-semibold px-8 py-6 text-lg transition-colors duration-200" onClick={() => {router.push("/signup")}}>
                 View Demo <MoveRight className="ml-2" />
               </Button>
             </motion.div>

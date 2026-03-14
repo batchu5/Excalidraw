@@ -8,8 +8,8 @@ import { middleware } from "./middleware";
 const {CreateUserSchema, SigninSchema, RoomSchema} = require("@repo/common/index");
 const { prismaClient } = require("@repo/db/client");
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.post("/signup", async(req, res)=>{
     const parsedData = CreateUserSchema.safeParse(req.body);
     if (!parsedData.success) {
