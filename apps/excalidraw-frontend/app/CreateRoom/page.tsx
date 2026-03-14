@@ -11,8 +11,6 @@ export default function CreateRoom() {
     const [slug, setSlug] = useState("");
     const router = useRouter()
 
-    const [isJoin, setisJoin] = useState("create");
-
 
     async function handleOnClick(type: "join" | "create") {
         let res;

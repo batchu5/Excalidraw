@@ -92,7 +92,7 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
         <div className="text-center">
           {isSignin ? (
             <>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <span
                 className="underline cursor-pointer"
                 onClick={() => router.push("/signup")}
