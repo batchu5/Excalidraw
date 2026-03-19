@@ -49,7 +49,7 @@ export default function Canvas({
       const resizeCanvas = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        game?.resize(); // Optional: call a method in Game to handle resize logic
+        game?.resize(); 
       };
 
       resizeCanvas(); // initial size

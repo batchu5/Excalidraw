@@ -1,6 +1,7 @@
 
 const {JWT_SECRET} = require("@repo/be-common/src/index");
-import express from "express";
+import express, { Request, Response } from "express";
+import dotenv from "dotenv";
 const app=express();
 import cors from "cors";
 import jwt from "jsonwebtoken";
@@ -8,8 +9,15 @@ import { middleware } from "./middleware";
 const {CreateUserSchema, SigninSchema, RoomSchema} = require("@repo/common/index");
 const { prismaClient } = require("@repo/db/client");
 
+dotenv.config();
+
+import Redis from "ioredis";
+
 app.use(cors());
 app.use(express.json());
+
+const redis = new Redis(process.env.REDIS_URL || "");
+
 app.post("/signup", async(req, res)=>{
     const parsedData = CreateUserSchema.safeParse(req.body);
     if (!parsedData.success) {
@@ -99,22 +107,41 @@ app.post("/room", middleware, async (req, res) => {
     }
 })
 
-app.get("/chats/:roomId", async(req, res) => {
+app.get("/chats/:roomId", async (req: Request, res: Response): Promise<void> => {
     try{
         const roomIdz = Number(req.params.roomId);
-        console.log("Incoming roomId:", req.params.roomId, typeof roomIdz);
-        const messages = await prismaClient.chat.findMany({
-            where:{
-                roomId: roomIdz
-            },
-            orderBy: {
-                id:"asc"
-            },
+        const redisKey = `room:${roomIdz}:shapes`;
+
+        const shapes = await redis.hgetall(redisKey);
+       
+        if (Object.keys(shapes).length > 0) {
+            console.log("CACHE HIT (Redis)");
+
+            const messages = Object.values(shapes).map(x => JSON.parse(x));
+
+            res.json({
+                messages
+            });
+            return;
+        }
+
+        console.log("CACHE MISS → DB");
+
+        const dbMessages = await prismaClient.chat.findMany({
+            where: { roomIdz },
+            orderBy: { id: "asc" },
             take: 100
-        })
+        });
+        console.log("db messages are", dbMessages);
+
+        const pipeline = redis.pipeline();
+        dbMessages.forEach((msg: any) => {
+            pipeline.hset(redisKey, msg.id, JSON.stringify(msg));
+        });
+        await pipeline.exec();
 
         res.json({
-            messages: messages
+            messages: dbMessages
         })
     }catch(e){
         res.json({messages: []})
@@ -130,7 +157,6 @@ app.get("/room/:slug", async(req, res) => {
                 slug: slug
             }
         })
-
         res.json({
             room
         })
