@@ -1,5 +1,5 @@
 #  Excalidraw Clone
-Deployed link -> https://excalidraw-excalidraw-frontend-de9nnzk8r.vercel.app/  
+Deployed link -> https://excalidraw-excalidraw-frontend-theta.vercel.app/
 
 ##  How to Run  
 
